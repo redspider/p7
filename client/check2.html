@@ -1,0 +1,122 @@
+<html>
+    <head>
+        <title>Canvas experiments</title>
+        
+        <script type="text/javascript" src="support.js"></script>
+        <script type="text/javascript" src="vector.js"></script>
+        <script type="text/javascript" src="messaging.js"></script>
+        <script type="text/javascript" src="element.js"></script>
+        <script type="text/javascript">
+            
+            counter = 0;
+            
+            function draw() {
+                var canvas = document.getElementById('test1');
+                
+                var ctx = canvas.getContext('2d');
+                console.log("frame");
+                var display = new Display(ctx, 560, 760);
+                
+                var sine_source = new Broadcast('sine_source');
+                var random_source = new Broadcast('random_source');
+                
+                // Chain to generate bps in two directions as sources from sine
+                var bps_in_source = new BroadcastTypecast('bps_in_source', 'bits_per_second_in', 100*1024*1024*8);
+                bps_in_source.subscribe(random_source);
+                var bps_out_source = new BroadcastTypecast('bps_out_source', 'bits_per_second_out', 100*1024*1024*8);
+                bps_out_source.subscribe(random_source);
+                
+                // Chain to turn bps into history for chart
+                var bps_in_history_source = new BroadcastHistory('bps_in_history_source', 60);
+                bps_in_history_source.subscribe(bps_in_source);
+                var bps_out_history_source = new BroadcastHistory('bps_out_history_source', 60);
+                bps_out_history_source.subscribe(bps_out_source);
+                
+                for (var i=0; i<60; i++) {
+                    random_source.send({'value': Math.random()});
+                }
+                
+                // Initialise layer
+                var phys_layer = new Layer();
+                
+                function link(vectors) {
+                    var l = new Link(vectors,60, 100+100*Math.random());
+                    l.subscribe(bps_in_history_source);
+                    l.subscribe(bps_out_history_source);
+                    phys_layer.add(l);
+                }
+                
+                link([new Vector(120,120),new Vector(280,120),new Vector(280,280)]);
+                link([new Vector(120,200),new Vector(260,200),new Vector(260,280)]);
+                link([new Vector(120,280),new Vector(260,280)]);
+                
+                phys_layer.add(new DimLink([new Vector(280,280),new Vector(280,440)],100));
+
+                link([new Vector(120,440),new Vector(280,440)]);
+                link([new Vector(120,520),new Vector(280,520)]);
+                //
+                link([new Vector(160,640),new Vector(260,640),new Vector(260,540)]);
+                link([new Vector(360,680),new Vector(300,680),new Vector(300,540)]);
+                //
+                link([new Vector(440,520),new Vector(280,520)]);
+                link([new Vector(440,120),new Vector(305,120),new Vector(305,280)]);
+                link([new Vector(440,200),new Vector(360,200),new Vector(360,280), new Vector(300,280)]);
+                //
+                phys_layer.add(new DimLink([new Vector(120,520),new Vector(40,520),new Vector(40,360), new Vector(260,360), new Vector(260,280)],100)).receive({'type':'status','error':true});
+
+                // 
+                phys_layer.add(new Node(120,120,12));
+                phys_layer.add(new Node(120,200,15));
+                phys_layer.add(new Node(120,280,15));
+                var n = new Node(120,440,20);
+                n.add_bar(40,30,26,"cpu").subscribe(random_source);
+                n.add_bar(40,0,26,"mem").subscribe(sine_source);
+                n.add_bar(40,270,10,"cpu0").subscribe(random_source);
+                n.add_bar(40,282,10,"cpu1").subscribe(sine_source);
+                n.add_bar(40,294,10,"cpu2");
+                n.add_bar(40,306,10,"cpu3").subscribe(random_source);
+                
+                n.add_bar(40,220,10,"root");
+                n.add_bar(40,232,10,"/home");
+                
+                phys_layer.add(n);
+                phys_layer.add(new Node(120,520,30)).receive({'type':'status','error':true});
+                
+                //
+                phys_layer.add(new Node(160,640,15));
+                phys_layer.add(new Node(360,680,25));
+                phys_layer.add(new Node(440,520,15));
+                
+                phys_layer.add(new Node(440,200,20)).add_bar(40,30,30,"cpu").subscribe(sine_source);
+                phys_layer.add(new Node(440,120,12));
+                
+                phys_layer.add(new Cloud(240,400,80,160,20));
+                phys_layer.add(new Cloud(240,260,80,40,20));
+                
+                display.add(phys_layer);
+ 
+ 
+                // Set up data sources
+                
+                setInterval(function () {
+                    counter+=10;
+                    counter = counter % 360;
+                    var value = Math.sin((counter/360.0)*Math.PI*2);
+                    sine_source.send({'value': (0.5+(value/2))});
+                    random_source.send({'value': Math.random()});
+                }, 1000);
+                    
+                function frame () {
+                    display.clear();
+                    display.render();
+                    setTimeout(frame, 40);
+                }
+                frame();
+                
+            }
+        </script>
+    </head>
+    <body onload="draw()">
+        <canvas id="test1" width="560" height="760"></canvas>
+    </body>
+</html>
