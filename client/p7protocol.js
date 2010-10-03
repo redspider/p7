@@ -7,7 +7,8 @@ var Connection = Class.extend({
     on_auth_challenge: function (challenge) {
         // When implemented in production, this method should be overridden to prompt the user
         // for a username and password.
-        return {username: 'guest', password: HMAC_SHA256_MAC('guest',challenge)};
+	console.log(HMAC_SHA256_MAC(challenge,'guest'));
+        return {username: 'guest', password: HMAC_SHA256_MAC(challenge,'guest')};
     },
     
     open: function () {

@@ -32,7 +32,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
     
     def open(self):
         """ When a websocket is opened, we need to send welcome """
-        self.challenge = hashlib.sha256(random.randbits(256)).hexdigest() # Sufficiently random challenge. Probably.
+        self.challenge = hashlib.sha256(str(random.getrandbits(256))).hexdigest() # Sufficiently random challenge. Probably.
         self.msg(type="p7.welcome",version=1,challenge=self.challenge)
         self.state = 'new'
     
@@ -53,8 +53,9 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
             # known to the server in plaintext. It seems practical with current
             # technology to generate a bcrypt'd version at the javascript end
             # instead. Ignoring for now, more important things to do
-            match = hmac.new(self.challenge, 'guest').hexdigest()
+            match = hmac.new(self.challenge, 'guest', hashlib.sha256).hexdigest()
             if message['password'] != match:
+                print match
                 self.msg(type='py.error.auth_failed',message='Invalid username or password')
                 return
             
