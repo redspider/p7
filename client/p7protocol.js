@@ -1,7 +1,13 @@
 var Connection = Class.extend({
-    init: function (url) {
+    init: function (url, username, password) {
         this.version = 1;
         this.url = url;
+    },
+ 
+    on_auth_challenge: function (challenge) {
+        // When implemented in production, this method should be overridden to prompt the user
+        // for a username and password.
+        return {username: 'guest', password: HMAC_SHA256_MAC('guest',challenge)};
     },
     
     open: function () {
@@ -28,7 +34,8 @@ var Connection = Class.extend({
         var m = JSON.parse(evt.data);
         console.log(m);
 	if (m.type == 'p7.welcome') {
-		this._ws.send(JSON.stringify({type: 'p7.authenticate', version: 1, username: 'quack'}));
+            var c = this.on_auth_challenge(m.challenge);
+            this._ws.send(JSON.stringify({type: 'p7.authenticate', version: 1, username: c.username, password: c.password}));
 	}
     }
 });

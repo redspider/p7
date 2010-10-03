@@ -4,7 +4,7 @@ import tornado.options
 import tornado.web
 import tornado.websocket
 import simplejson as json
-import time, os
+import time, os, hashlib, random, hmac
 
 from tornado.options import define, options
 
@@ -32,7 +32,8 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
     
     def open(self):
         """ When a websocket is opened, we need to send welcome """
-        self.msg(type="p7.welcome",version=1)
+        self.challenge = hashlib.sha256(random.randbits(256)).hexdigest() # Sufficiently random challenge. Probably.
+        self.msg(type="p7.welcome",version=1,challenge=self.challenge)
         self.state = 'new'
     
     def on_close(self):
@@ -42,10 +43,21 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
         global active_clients
         # Subscription message?
-	message = json.loads(message)
+        message = json.loads(message)
         if message['type'] == 'p7.authenticate':
-            # No password checks or anything at the moment, this is just a
-            # placeholder to ensure they arrive later
+            # Password is always "guest" at the moment. The challenge prevents
+            # the password from being sent in the clear while avoiding any
+            # replay issues
+            #
+            # The only issue is that in this sense, it requires the password to be
+            # known to the server in plaintext. It seems practical with current
+            # technology to generate a bcrypt'd version at the javascript end
+            # instead. Ignoring for now, more important things to do
+            match = hmac.new(self.challenge, 'guest').hexdigest()
+            if message['password'] != match:
+                self.msg(type='py.error.auth_failed',message='Invalid username or password')
+                return
+            
             self.state = 'authenticated'
             self.version = message['version']
             self.username = message['username']
