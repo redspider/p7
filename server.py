@@ -24,7 +24,22 @@ P7 requires that you subscribe to the things you're interested in, except for
 the initial configuration message
 """
 
+class Source(object):
+    """ A data source """
+    def __init__(self):
+        self.subscribers = set([])
+    
+    def receive(self, value):
+        """ New value received. ... not sure what to do with it yet """
+        pass
+    
+    def subscribe(self, subscriber):
+        """ New subscriber, add to sub set """
+        self.subscribers.add(subscriber)
+        
+
 active_clients = []
+sources = dict()
 
 class P7WebSocket(tornado.websocket.WebSocketHandler):
     def msg(self, **kwargs):
@@ -62,7 +77,31 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
             self.version = message['version']
             self.username = message['username']
             # Send the current configuration
-            self.msg(type='p7.configure',config={})
+            # Currently a fake config defining one layer, containing one node
+            # which supplies a CPU source on source.raven.cpu
+            self.msg(type='p7.configure',config={
+                'nodes': {
+                    'raven': {
+                        'label': 'raven',
+                        'long_label': 'raven.redspider.co.nz',
+                        'x': 120,
+                        'y': 120,
+                        'radius': 50
+                    }
+                },
+                'layers': {
+                    'physical': {
+                        'label': 'Physical',
+                        'nodes': {
+                            'raven': {
+                                'sources': {
+                                    'cpu': {'type': 'random_percent', 'radius': 100, 'angle': 32, 'arc': 26}
+                                }
+                            }
+                        },
+                    }
+                }
+            })
             # Register client for time signaling
             active_clients.append(self)
             return
@@ -79,6 +118,10 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
         
         if message['type'] == 'p7.subscribe':
             # If they've got a valid target, sub this client
+            if sources.has_key(message['source']):
+                sources[message['source']].subscribe(self)
+                self.msg(type="p7.subscribed", source=message['source'], message="Subscribed to %s successfully" % message['source'])
+                return
             # Otherwise, error
             self.msg(type="p7.error.invalid_source", message="Invalid message source")
             return
@@ -92,6 +135,17 @@ def time_signal():
         ws.msg(type="p7.time",time=time.time())
     print "Sending time signal"
     tornado.ioloop.IOLoop.instance().add_timeout(time.time()+1, time_signal)
+
+def fake_sources():
+    global sources
+    
+    for source in sources.values():
+        if source.type == 'random_percent':
+            source.receive(random.randint(0,100))
+            
+    tornado.ioloop.IOLoop.instance().add_timeout(time.time()+1, fake_sources)
+    
+    
 
 def main():
     tornado.options.parse_command_line()
