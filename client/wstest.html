@@ -7,7 +7,12 @@
 <script language="javascript" type="text/javascript" src="p7protocol.js"></script>
 <script type="text/javascript">
 
-  var wsUri = "ws://raven.redspider.co.nz:8888/ws";
+  var wsUri = "ws://raven.redspider.co.nz:8888/p7";
+
+  function init() {
+	var p = new Connection(wsUri);
+	p.open();
+  }
 
   window.addEventListener("load", init, false);
 

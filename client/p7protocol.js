@@ -5,11 +5,12 @@ var Connection = Class.extend({
     },
     
     open: function () {
+	var conn = this;
         this._ws = new WebSocket(this.url);
-        this._ws.onopen = function (evt) { this.on_open(evt); }
-        this._ws.onclose = function (evt) { this.on_close(evt); }
-        this._ws.onmessage = function (evt) { this.on_message(evt); }
-        this._ws.onerror = function (evt) { this.on_error(evt); }
+        this._ws.onopen = function (evt) { conn.on_open(evt); }
+        this._ws.onclose = function (evt) { conn.on_close(evt); }
+        this._ws.onmessage = function (evt) { conn.on_message(evt); }
+        this._ws.onerror = function (evt) { conn.on_error(evt); }
     },
     
     on_open: function () {
@@ -23,7 +24,11 @@ var Connection = Class.extend({
     },
     
     on_message: function (evt) {
-        var m = JSON.parse(evt);
+	console.log(evt);
+        var m = JSON.parse(evt.data);
         console.log(m);
+	if (m.type == 'p7.welcome') {
+		this._ws.send(JSON.stringify({type: 'p7.authenticate', version: 1, username: 'quack'}));
+	}
     }
 });

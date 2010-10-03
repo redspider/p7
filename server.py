@@ -34,9 +34,15 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
         """ When a websocket is opened, we need to send welcome """
         self.msg(type="p7.welcome",version=1)
         self.state = 'new'
-        
+    
+    def on_close(self):
+        global active_clients
+        active_clients.remove(self)
+
     def on_message(self, message):
+        global active_clients
         # Subscription message?
+	message = json.loads(message)
         if message['type'] == 'p7.authenticate':
             # No password checks or anything at the moment, this is just a
             # placeholder to ensure they arrive later
@@ -69,6 +75,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
         self.msg(type="p7.error.invalid_message_type", message="Invalid message type")
 
 def time_signal():
+    global active_clients
     for ws in active_clients:
         ws.msg(type="p7.time",time=time.time())
     print "Sending time signal"
@@ -83,6 +90,7 @@ def main():
     ], static_path=os.path.join(os.path.dirname(__file__), "client"))
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(options.port)
+    tornado.ioloop.IOLoop.instance().add_timeout(time.time()+1, time_signal)
     tornado.ioloop.IOLoop.instance().start()
 
 
