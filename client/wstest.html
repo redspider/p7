@@ -9,13 +9,21 @@
 <script type="text/javascript">
 
   var wsUri = "ws://raven.redspider.co.nz:8888/p7";
+  var p = null;
 
   function init() {
-	var p = new Connection(wsUri);
+	p = new Connection(wsUri);
 	p.open();
   }
 
   window.addEventListener("load", init, false);
+  
+  setTimeout(function () {
+    p.send({type: 'subscribe', source: 'raven.cpu'});
+  }, 1000);
+  setTimeout(function () {
+    p.send({type: 'request', source: 'raven.cpu', start: p.time-120, end: p.time, step: 60, key: 'fruitjoobs'});
+  }, 2000);
 
 </script>
 

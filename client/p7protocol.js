@@ -11,6 +11,10 @@ var Connection = Class.extend({
         return {username: 'guest', password: HMAC_SHA256_MAC(challenge,'guest')};
     },
     
+    send: function (m) {
+        this._ws.send(JSON.stringify(m));
+    },
+    
     open: function () {
 	var conn = this;
         this._ws = new WebSocket(this.url);
@@ -36,7 +40,14 @@ var Connection = Class.extend({
         console.log(m);
 	if (m.type == 'p7.welcome') {
             var c = this.on_auth_challenge(m.challenge);
-            this._ws.send(JSON.stringify({type: 'p7.authenticate', version: 1, username: c.username, password: c.password}));
+            this.send({type: 'p7.authenticate', version: 1, username: c.username, password: c.password});
+            return;
 	}
+        
+        if (m.type == 'p7.time') {
+            this.current_time = m.time;
+            return;
+        }
+        
     }
 });
