@@ -230,6 +230,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
             return
         
         if message['type'] == 'p7.request':
+            print message
             # Request an analysis set
             if sources.has_key(message['source']):
                 self.msg(type="p7.in_progress", key=message['key'], message="Data request in progress")
