@@ -35,9 +35,8 @@ var Connection = Class.extend({
     },
     
     on_message: function (evt) {
-	console.log(evt);
         var m = JSON.parse(evt.data);
-        console.log(m);
+        console.log(m.type);
 	if (m.type == 'p7.welcome') {
             var c = this.on_auth_challenge(m.challenge);
             this.send({type: 'p7.authenticate', version: 1, username: c.username, password: c.password});

@@ -24,14 +24,24 @@ P7 requires that you subscribe to the things you're interested in, except for
 the initial configuration message
 """
 
+"""
+
+Todo:
+
+Fix quartile calculations for low-sample
+Get wstest.html working
+Figure out a way to do ws to localhost so I don't have to keep fucking with raven. Oh, easy, specify local ethernet IP instead of localhost
+"""
+
 def five_sum(values):
     """ Takes a set of numeric values and builds a five number summary
         (min, 25th, 50th, 75th, max). Doesn't provide the mean. Do we need the mean?
     """
     values.sort()
-    quartile = len(values)/4
+    size = len(values)
     
-    return (values[0], values[quartile], values[quartile*2], values[quartile*3], values[-1])
+    # Not sure these are terribly accurate for the quartiles under low-sample conditions
+    return (values[0], values[size/4], values[size/2], values[-(size/4)], values[-1])
 
 class Source(object):
     """ A data source """
@@ -53,7 +63,7 @@ class Source(object):
         # TODO: calculate messages-per-second for use in smoothing client-side
         self.last.append(ts)
         if len(self.last) > self.last_count:
-            self.last.shift()
+            self.last.pop(0)
         
         if (ts <= self.last[0]):
             # In this case we can't guess, so we'll stick with 1
@@ -67,7 +77,7 @@ class Source(object):
         for subscriber in self.subscribers:
             # Expected is the time the next message is expected, calculated from
             # the existing time + seconds per message
-            subscriber.msg(type="p7.s.%s" % id, value=value, time=ts, expected=ts+spm)
+            subscriber.msg(type="p7.s.%s" % id, values=values, time=ts, expected=ts+spm)
         # We also need to store it with a timestamp
         self.history.append((ts, values))
     
@@ -99,7 +109,7 @@ class Source(object):
         result = []
         for m in self.history:
             # Might need to put in a value at either end
-            if m.time > start and m.time < end:
+            if m[0] > start and m[0] < end:
                 result.append(m)
         
         final = []
@@ -107,7 +117,7 @@ class Source(object):
             total = [[]] * self.value_count
             while len(result):
                 # Get the time and values out of the result
-                (rt, rv) = result.shift()
+                (rt, rv) = result.pop(0)
                 # If the time is out of range, break out of this step
                 if rt >= (t+step):
                     break
