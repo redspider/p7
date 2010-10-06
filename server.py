@@ -53,7 +53,7 @@ class Source(object):
         # TODO: calculate messages-per-second for use in smoothing client-side
         self.last.append(ts)
         if len(self.last) > self.last_count:
-            self.last.shift()
+            self.last.pop(0)
         
         if (ts <= self.last[0]):
             # In this case we can't guess, so we'll stick with 1
@@ -67,7 +67,7 @@ class Source(object):
         for subscriber in self.subscribers:
             # Expected is the time the next message is expected, calculated from
             # the existing time + seconds per message
-            subscriber.msg(type="p7.s.%s" % id, value=value, time=ts, expected=ts+spm)
+            subscriber.msg(type="p7.s.%s" % id, values=values, time=ts, expected=ts+spm)
         # We also need to store it with a timestamp
         self.history.append((ts, values))
     
@@ -99,7 +99,7 @@ class Source(object):
         result = []
         for m in self.history:
             # Might need to put in a value at either end
-            if m.time > start and m.time < end:
+            if m[0] > start and m[0] < end:
                 result.append(m)
         
         final = []
@@ -107,7 +107,7 @@ class Source(object):
             total = [[]] * self.value_count
             while len(result):
                 # Get the time and values out of the result
-                (rt, rv) = result.shift()
+                (rt, rv) = result.pop(0)
                 # If the time is out of range, break out of this step
                 if rt >= (t+step):
                     break
@@ -220,6 +220,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
             return
         
         if message['type'] == 'p7.request':
+            print message
             # Request an analysis set
             if sources.has_key(message['source']):
                 self.msg(type="p7.in_progress", key=message['key'], message="Data request in progress")

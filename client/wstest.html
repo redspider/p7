@@ -19,10 +19,10 @@
   window.addEventListener("load", init, false);
   
   setTimeout(function () {
-    p.send({type: 'subscribe', source: 'raven.cpu'});
+    p.send({type: 'p7.subscribe', source: 'raven.cpu'});
   }, 1000);
   setTimeout(function () {
-    p.send({type: 'request', source: 'raven.cpu', start: p.time-120, end: p.time, step: 60, key: 'fruitjoobs'});
+    p.send({type: 'p7.request', source: 'raven.cpu', start: p.current_time-120, 'end': p.current_time, step: 60, key: 'fruitjoobs'});
   }, 2000);
 
 </script>
