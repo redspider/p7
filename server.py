@@ -37,10 +37,16 @@ def five_sum(values):
     """ Takes a set of numeric values and builds a five number summary
         (min, 25th, 50th, 75th, max). Doesn't provide the mean. Do we need the mean?
     """
+    if (len(values) == 0):
+        return (None,None,None,None,None)
+    
     values.sort()
     size = len(values)
     
     # Not sure these are terribly accurate for the quartiles under low-sample conditions
+    if len(values) < 2:
+        return (values[0], values[0], values[0], values[0], values[0])
+    
     return (values[0], values[size/4], values[size/2], values[-(size/4)], values[-1])
 
 class Source(object):
@@ -59,8 +65,7 @@ class Source(object):
     def receive(self, values):
         """ New value received. ... not sure what to do with it yet """
         ts = time.time()
-        # I guess we need to send it to subscribers. Format?
-        # TODO: calculate messages-per-second for use in smoothing client-side
+        
         self.last.append(ts)
         if len(self.last) > self.last_count:
             self.last.pop(0)
@@ -77,7 +82,7 @@ class Source(object):
         for subscriber in self.subscribers:
             # Expected is the time the next message is expected, calculated from
             # the existing time + seconds per message
-            subscriber.msg(type="p7.s.%s" % id, values=values, time=ts, expected=ts+spm)
+            subscriber.msg(type="p7.s", source=self.id, values=values, time=ts, expected=ts+spm)
         # We also need to store it with a timestamp
         self.history.append((ts, values))
     
@@ -113,6 +118,9 @@ class Source(object):
                 result.append(m)
         
         final = []
+        start = int(start)
+        end = int(end)
+        step = int(step)
         for t in xrange(start, end, step):
             total = [[]] * self.value_count
             while len(result):
@@ -134,7 +142,7 @@ class Source(object):
             final.append((t, total))
     
         # Send message to subscriber detailing result
-        subscriber.msg(type="p7.r.%s" % self.id, key=key, start=start, end=end, step=start, value_set=final)
+        subscriber.msg(type="p7.r", source=self.id, key=key, start=start, end=end, step=start, value_set=final)
         
     def subscribe(self, subscriber):
         """ New subscriber, add to sub set """
@@ -146,7 +154,10 @@ sources = dict()
 
 class P7WebSocket(tornado.websocket.WebSocketHandler):
     def msg(self, **kwargs):
-        self.write_message(kwargs)
+        try:
+            self.write_message(kwargs)
+        except IOError, e:
+            pass
     
     def open(self):
         """ When a websocket is opened, we need to send welcome """
@@ -183,25 +194,24 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
             # Currently a fake config defining one layer, containing one node
             # which supplies a CPU source on source.raven.cpu
             self.msg(type='p7.configure',config={
-                'nodes': {
-                    'raven': {
-                        'label': 'raven',
-                        'long_label': 'raven.redspider.co.nz',
+                'world': {
+                    'macbook': {
+                        'type': 'Router',
+                        'label': 'macbook',
                         'x': 120,
                         'y': 120,
-                        'radius': 50
-                    }
-                },
-                'layers': {
-                    'physical': {
-                        'label': 'Physical',
-                        'nodes': {
-                            'raven': {
-                                'sources': {
-                                    'cpu': {'type': 'random_percent', 'radius': 100, 'angle': 32, 'arc': 26}
-                                }
+                        'radius': 40,
+                        'charts': {
+                            'cpu': {
+                                'type': 'PieBar',
+                                'value_type': 'percentage',
+                                'label': 'cpu',
+                                'radius': 80,
+                                'angle': 30,
+                                'arc': 28,
+                                'source': 'macbook.cpu'
                             }
-                        },
+                        }
                     }
                 }
             })
@@ -274,7 +284,7 @@ def main():
     # Start the time signal
     time_signal()
     # Start the fake source providers
-    sources['raven.cpu'] = Source('raven.cpu', 'random_percent',1,'percentage')
+    sources['macbook.cpu'] = Source('macbook.cpu', 'random_percent',1,'percentage')
     fake_sources()
     tornado.ioloop.IOLoop.instance().start()
 

@@ -7,7 +7,6 @@ var Connection = Class.extend({
     on_auth_challenge: function (challenge) {
         // When implemented in production, this method should be overridden to prompt the user
         // for a username and password.
-	console.log(HMAC_SHA256_MAC(challenge,'guest'));
         return {username: 'guest', password: HMAC_SHA256_MAC(challenge,'guest')};
     },
     
@@ -20,21 +19,20 @@ var Connection = Class.extend({
         this._ws = new WebSocket(this.url);
         this._ws.onopen = function (evt) { conn.on_open(evt); }
         this._ws.onclose = function (evt) { conn.on_close(evt); }
-        this._ws.onmessage = function (evt) { conn.on_message(evt); }
+        this._ws.onmessage = function (evt) { conn.on_basic_message(evt); }
         this._ws.onerror = function (evt) { conn.on_error(evt); }
     },
     
     on_open: function () {
-        console.log("Connection opened");
     },
     on_close: function () {
-        console.log("Connection closed");
     },
     on_error: function () {
-        console.log("Connection error",evt);
+    },
+    on_message: function () {
     },
     
-    on_message: function (evt) {
+    on_basic_message: function (evt) {
         var m = JSON.parse(evt.data);
         
 	if (m.type != 'p7.time') { console.log(m); }
@@ -49,6 +47,8 @@ var Connection = Class.extend({
             this.current_time = m.time;
             return;
         }
-        
+	
+
+        this.on_message(m);
     }
 });
