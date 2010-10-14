@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <title>UI Testing</title>
+        <link type="text/css" href="css/ui-darkness/jquery-ui-1.8.5.custom.css" rel="Stylesheet" />
+        <link type="text/css" href="app.css" rel="Stylesheet" />
+        <script type="text/javascript" src="jquery.js"></script>
+        <script type="text/javascript" src="js/jquery-ui-1.8.5.custom.min.js"></script>
+        <script type="text/javascript" src="support.js"></script>
+        <script type="text/javascript" src="jssha256.js"></script>
+        <script type="text/javascript" src="world.js"></script>
+        <script type="text/javascript" src="app.js"></script>
+        <script type="text/javascript" src="view.js"></script>
+        
+        <script type="text/javascript">
+            $(document).ready(function () {
+                var app = new App(document.getElementById('app_canvas'), {wsuri: 'ws://192.168.0.199:8888/p7'});
+            });
+        </script>
+    </head>
+    <body>
+        <canvas id="app_canvas"></canvas>
+    </body>
+</html>
