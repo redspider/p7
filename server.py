@@ -5,6 +5,9 @@ import tornado.web
 import tornado.websocket
 import simplejson as json
 import time, os, hashlib, random, hmac
+import collectd
+from tornado import iostream
+from pprint import pprint
 
 from tornado.options import define, options
 
@@ -19,138 +22,22 @@ class EchoWebSocket(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
        self.write_message(u"You said: " + message)
 
-"""
-P7 requires that you subscribe to the things you're interested in, except for
-the initial configuration message
-"""
 
-"""
+class SourceSet(object):
+    def __init__(self):
+        self.subscribers = dict()
 
-Todo:
-
-Fix quartile calculations for low-sample
-Get wstest.html working
-Figure out a way to do ws to localhost so I don't have to keep fucking with raven. Oh, easy, specify local ethernet IP instead of localhost
-"""
-
-def five_sum(values):
-    """ Takes a set of numeric values and builds a five number summary
-        (min, 25th, 50th, 75th, max). Doesn't provide the mean. Do we need the mean?
-    """
-    if (len(values) == 0):
-        return (None,None,None,None,None)
+    def subscribe(self, source, subscriber):
+        if (not self.subscribers.has_key(source)):
+            self.subscribers[source] = set([])
+        self.subscribers[source].add(subscriber)
     
-    values.sort()
-    size = len(values)
-    
-    # Not sure these are terribly accurate for the quartiles under low-sample conditions
-    if len(values) < 2:
-        return (values[0], values[0], values[0], values[0], values[0])
-    
-    return (values[0], values[size/4], values[size/2], values[-(size/4)], values[-1])
-
-class Source(object):
-    """ A data source """
-    def __init__(self, id, type, value_count, measure):
-        self.id = id
-        self.type = type
-        self.subscribers = set([])
-        self.history = []
-        self.last = []
-        self.last_count = 10
-        self.value_count = value_count
-        
-        self.measure = measure # bps, bytesps, percentage
-    
-    def receive(self, values):
-        """ New value received. ... not sure what to do with it yet """
-        ts = time.time()
-        
-        self.last.append(ts)
-        if len(self.last) > self.last_count:
-            self.last.pop(0)
-        
-        if (ts <= self.last[0]):
-            # In this case we can't guess, so we'll stick with 1
-            spm = 1
-        else:
-            # Normally be 10/10 for 1 second per message, but a 5 min update
-            # would be 3600/10 = 360s per message = 5 min per message
-            spm = (ts-self.last[0]) / len(self.last)
-        
-        # Send to subscribers
-        for subscriber in self.subscribers:
-            # Expected is the time the next message is expected, calculated from
-            # the existing time + seconds per message
-            subscriber.msg(type="p7.s", source=self.id, values=values, time=ts, expected=ts+spm)
-        # We also need to store it with a timestamp
-        self.history.append((ts, values))
-    
-    def prepare(self, subscriber, key, start, end, step):
-        """ Prepare an analysis section """
-        """ Analysis request involves a key given by the client, this is opaque and will be returned with the request for id'ing the response
-        the start and end are server times, in seconds, bounding the response. It is recommended these times be a proper multiple of step
-        step is the number of seconds per response set.
-        """
-        """
-        The result contains a value set that looks like this:
-        
-        value_set = [
-            [time, [[0,25,50,75,100],[0,10,20,30,100]]],
-            [time, [[0,25,50,75,100],[0,10,20,30,100]]],
-            ...
-        ]
-        
-        The five values are: min, 25th percentile, 50th, 75th, and max
-        for the sample space for that step. This allows proper display of the
-        data. It's plausible we want this to be 7-number (5%/95%) instead, or
-        maybe an option.
-        
-        """
-        
-        # The following is a trivial hack to do the analysis in the server
-        # in practice we want to make the backend do as much of this work
-        # as possible, whatever that backend ends up being.
-        result = []
-        for m in self.history:
-            # Might need to put in a value at either end
-            if m[0] > start and m[0] < end:
-                result.append(m)
-        
-        final = []
-        start = int(start)
-        end = int(end)
-        step = int(step)
-        for t in xrange(start, end, step):
-            total = [[]] * self.value_count
-            while len(result):
-                # Get the time and values out of the result
-                (rt, rv) = result.pop(0)
-                # If the time is out of range, break out of this step
-                if rt >= (t+step):
-                    break
-                
-                # For each value in rv
-                for i,v in enumerate(rv):
-                    # Add to the set
-                    total[i].append(v)
-            # Generate 5-sums for each of the values arrays
-            for i,v in enumerate(total):
-                total[i] = five_sum(v)
-            # Append item like this:
-            # (time, [[0,25,50,75,100],[0,25,30,40,60],...])
-            final.append((t, total))
-    
-        # Send message to subscriber detailing result
-        subscriber.msg(type="p7.r", source=self.id, key=key, start=start, end=end, step=start, value_set=final)
-        
-    def subscribe(self, subscriber):
-        """ New subscriber, add to sub set """
-        self.subscribers.add(subscriber)
-        
+    def send(self, source, ts, interval, values):
+        for subscriber in self.subscribers.get(source,[]):
+            subscriber.msg(type="p7.s", source=source, values=values, time=ts, expected=ts+interval)
 
 active_clients = []
-sources = dict()
+sources = SourceSet()
 
 class P7WebSocket(tornado.websocket.WebSocketHandler):
     def msg(self, **kwargs):
@@ -200,17 +87,86 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                         'label': 'macbook',
                         'x': 120,
                         'y': 120,
-                        'radius': 40,
+                        'radius': 20,
                         'charts': {
-                            'cpu': {
-                                'type': 'PieBar',
-                                'value_type': 'percentage',
-                                'label': 'cpu',
-                                'radius': 80,
-                                'angle': 30,
-                                'arc': 28,
-                                'source': 'macbook.cpu'
-                            }
+                            'mem_active': {
+                                'type': 'AbsPieBar',
+                                'value_unit': 'bytes',
+                                'value_limit': 4294967296,
+                                'label': 'mem/active',
+                                'radius': 24,
+                                'angle': -90,
+                                'arc': 180,
+                                'width': 20,
+                                'source': 'macbook/memory/memory/active'
+                            },
+                            'disk_used': {
+                                'type': 'AbsPieBar',
+                                'value_unit': 'bytes',
+                                'value_limit': 233*1024*1024*1024,
+                                'label': 'disk/root',
+                                'radius': 48,
+                                'angle': -90,
+                                'arc': 180,
+                                'width': 20,
+                                'source': 'macbook/df/df/root'
+                            },
+                            'load': {
+                                'type': 'AbsPieBar',
+                                'value_unit': '',
+                                'value_limit': 5,
+                                'label': 'load',
+                                'radius': 24,
+                                'angle': 92,
+                                'arc': 176,
+                                'width': 44,
+                                'source': 'macbook/load/load',
+                                'alarm': 1.2,
+                            },
+                            'cpu1': {
+                                'type': 'AbsPieBar',
+                                'value_unit': '',
+                                'value_limit': 3,
+                                'label': 'cpu1',
+                                'radius': 72,
+                                'angle': -90,
+                                'arc': 60,
+                                'width': 5,
+                                'source': 'macbook/load/load'
+                            },
+                            'cpu2': {
+                                'type': 'AbsPieBar',
+                                'value_unit': '',
+                                'value_limit': 3,
+                                'label': 'cpu2',
+                                'radius': 79,
+                                'angle': -90,
+                                'arc': 60,
+                                'width': 5,
+                                'source': 'macbook/load/load'
+                            },
+                            'cpu3': {
+                                'type': 'AbsPieBar',
+                                'value_unit': '',
+                                'value_limit': 3,
+                                'label': 'cpu3',
+                                'radius': 86,
+                                'angle': -90,
+                                'arc': 60,
+                                'width': 5,
+                                'source': 'macbook/load/load'
+                            },
+                            'cpu4': {
+                                'type': 'AbsPieBar',
+                                'value_unit': '',
+                                'value_limit': 3,
+                                'label': 'cpu4',
+                                'radius': 93,
+                                'angle': -90,
+                                'arc': 60,
+                                'width': 5,
+                                'source': 'macbook/load/load'
+                            },
                         }
                     }
                 }
@@ -231,13 +187,8 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
         
         if message['type'] == 'p7.subscribe':
             # If they've got a valid target, sub this client
-            if sources.has_key(message['source']):
-                sources[message['source']].subscribe(self)
-                self.msg(type="p7.subscribed", source=message['source'], message="Subscribed to %s successfully" % message['source'])
-                return
-            # Otherwise, error
-            self.msg(type="p7.error.invalid_source", message="Invalid message source")
-            return
+            sources.subscribe(message['source'], self)
+            self.msg(type="p7.subscribed", source=message['source'], message="Subscribed to %s successfully" % message['source'])
         
         if message['type'] == 'p7.request':
             print message
@@ -263,16 +214,25 @@ def time_signal():
 def fake_sources():
     global sources
     
-    for source in sources.values():
-        if source.type == 'random_percent':
-            source.receive([random.randint(0,100)])
+    sources.send('fake/random_percent',time.time(), 1, [random.randint(0,100)])
             
     tornado.ioloop.IOLoop.instance().add_timeout(time.time()+1, fake_sources)
     
     
+def on_collect(fd, events):
+    global sources
+    
+    iterable = collector.interpret()
+    for m in iterable:
+        pprint((m.source,list(m)))
+        
+        sources.send(m.source, m.time, m.interval, list(m))
+
+collector = None
+collector_stream = None
 
 def main():
-    global sources
+    global sources, collector, collector_stream
     tornado.options.parse_command_line()
     application = tornado.web.Application([
         (r"/", MainHandler),
@@ -281,13 +241,21 @@ def main():
     ], static_path=os.path.join(os.path.dirname(__file__), "client"))
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(options.port)
+    
+    
     # Start the time signal
     time_signal()
     # Start the fake source providers
-    sources['macbook.cpu'] = Source('macbook.cpu', 'random_percent',1,'percentage')
     fake_sources()
-    tornado.ioloop.IOLoop.instance().start()
+    
+    ioloop = tornado.ioloop.IOLoop.instance()
+    
+    # Set up collector
+    collector = collectd.Reader(host="192.168.0.199")
+    collector._sock.setblocking(0)
+    ioloop.add_handler(collector._sock.fileno(), on_collect, ioloop.READ)
 
+    ioloop.start()
 
 if __name__ == "__main__":
     main()
