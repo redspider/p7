@@ -29,7 +29,7 @@ world.builder = function (app, parent, config) {
             console.log("Unrecognised element ",element.type);
             continue;
         }
-        if (!element.type == 'Template') {
+        if (element.type != 'Template') {
             continue;
         }
         console.log("Found template",element);
