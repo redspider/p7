@@ -297,6 +297,9 @@ world.ArcBar = Class.extend({
         this.alarm_status = false;
         
         if (this.source) {
+            if (this.parent.prefix) {
+                this.source = this.parent.prefix + this.source;
+            }
             this.app.subscribe(this.source, $.proxy(this.on_message, this));
         }
         

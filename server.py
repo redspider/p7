@@ -95,7 +95,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                                 'angle': -90,
                                 'arc': 180,
                                 'width': 20,
-                                'source': 'monitor1/memory/memory/used'
+                                'source': 'memory/memory/used'
                             },
                             'disk_used': {
                                 'type': 'ArcBar',
@@ -106,7 +106,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                                 'angle': -90,
                                 'arc': 180,
                                 'width': 20,
-                                'source': 'monitor1/df/df/root'
+                                'source': 'df/df/root'
                             },
                             'load': {
                                 'type': 'ArcBar',
@@ -117,7 +117,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                                 'angle': 92,
                                 'arc': 176,
                                 'width': 44,
-                                'source': 'monitor1/load/load',
+                                'source': 'load/load',
                                 'alarm': 1.0,
                             },
                             'cpu0': {
@@ -129,7 +129,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                                 'angle': -90,
                                 'arc': 60,
                                 'width': 5,
-                                'source': 'monitor1/cpu/0/cpu/user'
+                                'source': 'cpu/0/cpu/user'
                             },
                             'cpu1': {
                                 'type': 'ArcBar',
@@ -140,7 +140,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                                 'angle': -90,
                                 'arc': 60,
                                 'width': 5,
-                                'source': 'monitor1/cpu/1/cpu/user'
+                                'source': 'cpu/1/cpu/user'
                             },
                             'cpu2': {
                                 'type': 'ArcBar',
@@ -151,7 +151,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                                 'angle': -90,
                                 'arc': 60,
                                 'width': 5,
-                                'source': 'monitor1/cpu/2/cpu/user'
+                                'source': 'cpu/2/cpu/user'
                             },
                             'cpu3': {
                                 'type': 'ArcBar',
@@ -162,7 +162,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                                 'angle': -90,
                                 'arc': 60,
                                 'width': 5,
-                                'source': 'monitor1/cpu/3/cpu/user'
+                                'source': 'cpu/3/cpu/user'
                             },
                         }
                     },
@@ -177,7 +177,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                     'monitor1': {
                         'type': 'Router',
                         'template': 'server_template',
-                        'source_prefix': 'monitor1/',
+                        'source_prefix': '',
                         'label': 'monitor1',
                         'x': 140,
                         'y': 120,
