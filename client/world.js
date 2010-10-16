@@ -96,6 +96,7 @@ world.Router = Class.extend({
         this.x = config.x;
         this.y = config.y;
         this.radius = config.radius;
+        this.source_prefix = config.source_prefix;
         this.children = world.builder(app, this, config.charts);
     },
     
