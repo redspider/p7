@@ -79,7 +79,9 @@ def decode_network_values(ptype, plen, buf):
             result.append((dstype, double.unpack_from(buf, off)[0]))
             off += valskip
         else:
-            raise ValueError("DS type %i unsupported" % dstype)
+            off += valskip
+            #pass
+            #raise ValueError("DS type %i unsupported" % dstype)
 
     return result
 

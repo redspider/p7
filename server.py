@@ -82,34 +82,34 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
             # which supplies a CPU source on source.raven.cpu
             self.msg(type='p7.configure',config={
                 'world': {
-                    'macbook': {
+                    'mail': {
                         'type': 'Router',
-                        'label': 'macbook',
-                        'x': 120,
+                        'label': 'mail',
+                        'x': 340,
                         'y': 120,
                         'radius': 20,
                         'charts': {
                             'mem_active': {
                                 'type': 'AbsPieBar',
                                 'value_unit': 'bytes',
-                                'value_limit': 4294967296,
-                                'label': 'mem/active',
+                                'value_limit': 321*1024*1024,
+                                'label': 'mem/used',
                                 'radius': 24,
                                 'angle': -90,
                                 'arc': 180,
                                 'width': 20,
-                                'source': 'macbook/memory/memory/active'
+                                'source': 'mail/memory/memory/used'
                             },
                             'disk_used': {
                                 'type': 'AbsPieBar',
                                 'value_unit': 'bytes',
-                                'value_limit': 233*1024*1024*1024,
+                                'value_limit': 9.4*1024*1024*1024,
                                 'label': 'disk/root',
                                 'radius': 48,
                                 'angle': -90,
                                 'arc': 180,
                                 'width': 20,
-                                'source': 'macbook/df/df/root'
+                                'source': 'mail/df/df/root'
                             },
                             'load': {
                                 'type': 'AbsPieBar',
@@ -120,8 +120,51 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                                 'angle': 92,
                                 'arc': 176,
                                 'width': 44,
-                                'source': 'macbook/load/load',
-                                'alarm': 1.2,
+                                'source': 'mail/load/load',
+                                'alarm': 1.0,
+                            },
+                        }
+                    },
+                    'monitor1': {
+                        'type': 'Router',
+                        'label': 'monitor1',
+                        'x': 140,
+                        'y': 120,
+                        'radius': 20,
+                        'charts': {
+                            'mem_active': {
+                                'type': 'AbsPieBar',
+                                'value_unit': 'bytes',
+                                'value_limit': 256*1024*1024,
+                                'label': 'mem/used',
+                                'radius': 24,
+                                'angle': -90,
+                                'arc': 180,
+                                'width': 20,
+                                'source': 'monitor1/memory/memory/used'
+                            },
+                            'disk_used': {
+                                'type': 'AbsPieBar',
+                                'value_unit': 'bytes',
+                                'value_limit': 9.4*1024*1024*1024,
+                                'label': 'disk/root',
+                                'radius': 48,
+                                'angle': -90,
+                                'arc': 180,
+                                'width': 20,
+                                'source': 'monitor1/df/df/root'
+                            },
+                            'load': {
+                                'type': 'AbsPieBar',
+                                'value_unit': '',
+                                'value_limit': 5,
+                                'label': 'load',
+                                'radius': 24,
+                                'angle': 92,
+                                'arc': 176,
+                                'width': 44,
+                                'source': 'monitor1/load/load',
+                                'alarm': 1.0,
                             },
                             'cpu1': {
                                 'type': 'AbsPieBar',
@@ -224,7 +267,7 @@ def on_collect(fd, events):
     
     iterable = collector.interpret()
     for m in iterable:
-        pprint((m.source,list(m)))
+        #pprint((m.source,list(m)))
         
         sources.send(m.source, m.time, m.interval, list(m))
 
@@ -251,7 +294,7 @@ def main():
     ioloop = tornado.ioloop.IOLoop.instance()
     
     # Set up collector
-    collector = collectd.Reader(host="192.168.0.199")
+    collector = collectd.Reader(host="67.23.45.129")
     collector._sock.setblocking(0)
     ioloop.add_handler(collector._sock.fileno(), on_collect, ioloop.READ)
 
