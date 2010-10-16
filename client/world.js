@@ -29,6 +29,21 @@ world.builder = function (app, parent, config) {
             console.log("Unrecognised element ",element.type);
             continue;
         }
+        if (!element.type == 'Template') {
+            continue;
+        }
+        
+        result[k] = new world[element.type](app, k, parent, element);
+    }
+    for (var k in config) {
+        var element = config[k];
+        if (!world[element.type]) {
+            console.log("Unrecognised element ",element.type);
+            continue;
+        }
+        if (element.type == 'Template') {
+            continue;
+        }
         
         result[k] = new world[element.type](app, k, parent, element);
     }
