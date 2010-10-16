@@ -55,7 +55,9 @@ world.Template = Class.extend({
         this.parent = parent;
         this.config = config;
         world.templates[id] = this;
-    }
+    },
+    
+    render: function () {}
 });
 
 world.Router = Class.extend({
