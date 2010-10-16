@@ -67,9 +67,9 @@ world.Router = Class.extend({
         this.parent = parent;
         
         if (config.template) {
-            for (var k in world.templates[config.template]) {
+            for (var k in world.templates[config.template].config) {
                 if (config[k] == undefined) {
-                    config[k] = world.templates[config.template][k];
+                    config[k] = world.templates[config.template].config[k];
                 }
             }
         }
