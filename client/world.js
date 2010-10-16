@@ -32,7 +32,7 @@ world.builder = function (app, parent, config) {
         if (!element.type == 'Template') {
             continue;
         }
-        console.log("Found template");
+        console.log("Found template",element);
         
         result[k] = new world[element.type](app, k, parent, element);
     }
