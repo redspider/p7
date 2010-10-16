@@ -19,6 +19,8 @@
 
 var world = {};
 
+world.templates = {};
+
 world.builder = function (app, parent, config) {
     var result = {};
     for (var k in config) {
@@ -46,11 +48,30 @@ world.World = Class.extend({
     }
 });
 
+world.Template = Class.extend({
+    init: function (app, id, parent, config) {
+        this.app = app;
+        this.id = id;
+        this.parent = parent;
+        this.config = config;
+        world.templates[id] = this;
+    }
+});
+
 world.Router = Class.extend({
     init: function (app, id, parent, config) {
         this.app = app;
         this.id = id;
         this.parent = parent;
+        
+        if (config.template) {
+            for (var k in world.templates[config.template]) {
+                if (config[k] == undefined) {
+                    config[k] = world.templates[config.template][k];
+                }
+            }
+        }
+        
         this.label = config.label;
         this.x = config.x;
         this.y = config.y;

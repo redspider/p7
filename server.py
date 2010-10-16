@@ -82,54 +82,8 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
             # which supplies a CPU source on source.raven.cpu
             self.msg(type='p7.configure',config={
                 'world': {
-                    'mail': {
-                        'type': 'Router',
-                        'label': 'mail',
-                        'x': 340,
-                        'y': 120,
-                        'radius': 20,
-                        'charts': {
-                            'mem_active': {
-                                'type': 'ArcBar',
-                                'value_unit': 'bytes',
-                                'value_limit': 321*1024*1024,
-                                'label': 'mem/used',
-                                'radius': 24,
-                                'angle': -90,
-                                'arc': 180,
-                                'width': 20,
-                                'source': 'mail/memory/memory/used'
-                            },
-                            'disk_used': {
-                                'type': 'ArcBar',
-                                'value_unit': 'bytes',
-                                'value_limit': 9.4*1024*1024*1024,
-                                'label': 'disk/root',
-                                'radius': 48,
-                                'angle': -90,
-                                'arc': 180,
-                                'width': 20,
-                                'source': 'mail/df/df/root'
-                            },
-                            'load': {
-                                'type': 'ArcBar',
-                                'value_unit': '',
-                                'value_limit': 5,
-                                'label': 'load',
-                                'radius': 24,
-                                'angle': 92,
-                                'arc': 176,
-                                'width': 44,
-                                'source': 'mail/load/load',
-                                'alarm': 1.0,
-                            },
-                        }
-                    },
-                    'monitor1': {
-                        'type': 'Router',
-                        'label': 'monitor1',
-                        'x': 140,
-                        'y': 120,
+                    'server_template': {
+                        'type': 'Template',
                         'radius': 20,
                         'charts': {
                             'mem_active': {
@@ -211,6 +165,22 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                                 'source': 'monitor1/cpu/3/cpu/user'
                             },
                         }
+                    },
+                    'mail': {
+                        'type': 'Router',
+                        'label': 'mail',
+                        'template': 'server_template',
+                        'source_prefix': 'mail/',
+                        'x': 340,
+                        'y': 120,
+                    },
+                    'monitor1': {
+                        'type': 'Router',
+                        'template': 'server_template',
+                        'source_prefix': 'monitor1/',
+                        'label': 'monitor1',
+                        'x': 140,
+                        'y': 120,
                     }
                 }
             })
