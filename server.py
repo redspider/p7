@@ -90,7 +90,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                         'radius': 20,
                         'charts': {
                             'mem_active': {
-                                'type': 'AbsPieBar',
+                                'type': 'ArcBar',
                                 'value_unit': 'bytes',
                                 'value_limit': 321*1024*1024,
                                 'label': 'mem/used',
@@ -101,7 +101,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                                 'source': 'mail/memory/memory/used'
                             },
                             'disk_used': {
-                                'type': 'AbsPieBar',
+                                'type': 'ArcBar',
                                 'value_unit': 'bytes',
                                 'value_limit': 9.4*1024*1024*1024,
                                 'label': 'disk/root',
@@ -112,7 +112,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                                 'source': 'mail/df/df/root'
                             },
                             'load': {
-                                'type': 'AbsPieBar',
+                                'type': 'ArcBar',
                                 'value_unit': '',
                                 'value_limit': 5,
                                 'label': 'load',
@@ -133,7 +133,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                         'radius': 20,
                         'charts': {
                             'mem_active': {
-                                'type': 'AbsPieBar',
+                                'type': 'ArcBar',
                                 'value_unit': 'bytes',
                                 'value_limit': 256*1024*1024,
                                 'label': 'mem/used',
@@ -144,7 +144,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                                 'source': 'monitor1/memory/memory/used'
                             },
                             'disk_used': {
-                                'type': 'AbsPieBar',
+                                'type': 'ArcBar',
                                 'value_unit': 'bytes',
                                 'value_limit': 9.4*1024*1024*1024,
                                 'label': 'disk/root',
@@ -155,7 +155,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                                 'source': 'monitor1/df/df/root'
                             },
                             'load': {
-                                'type': 'AbsPieBar',
+                                'type': 'ArcBar',
                                 'value_unit': '',
                                 'value_limit': 5,
                                 'label': 'load',
@@ -166,49 +166,49 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                                 'source': 'monitor1/load/load',
                                 'alarm': 1.0,
                             },
-                            'cpu1': {
-                                'type': 'AbsPieBar',
+                            'cpu0': {
+                                'type': 'ArcBar',
                                 'value_unit': '',
-                                'value_limit': 3,
-                                'label': 'cpu1',
+                                'value_limit': 100,
+                                'label': 'cpu0',
                                 'radius': 72,
                                 'angle': -90,
                                 'arc': 60,
                                 'width': 5,
-                                'source': 'macbook/load/load'
+                                'source': 'monitor1/cpu/0/cpu/user'
                             },
-                            'cpu2': {
-                                'type': 'AbsPieBar',
+                            'cpu1': {
+                                'type': 'ArcBar',
                                 'value_unit': '',
-                                'value_limit': 3,
-                                'label': 'cpu2',
+                                'value_limit': 100,
+                                'label': 'cpu1',
                                 'radius': 79,
                                 'angle': -90,
                                 'arc': 60,
                                 'width': 5,
-                                'source': 'macbook/load/load'
+                                'source': 'monitor1/cpu/1/cpu/user'
                             },
-                            'cpu3': {
-                                'type': 'AbsPieBar',
+                            'cpu2': {
+                                'type': 'ArcBar',
                                 'value_unit': '',
-                                'value_limit': 3,
-                                'label': 'cpu3',
+                                'value_limit': 100,
+                                'label': 'cpu2',
                                 'radius': 86,
                                 'angle': -90,
                                 'arc': 60,
                                 'width': 5,
-                                'source': 'macbook/load/load'
+                                'source': 'monitor1/cpu/2/cpu/user'
                             },
-                            'cpu4': {
-                                'type': 'AbsPieBar',
+                            'cpu3': {
+                                'type': 'ArcBar',
                                 'value_unit': '',
-                                'value_limit': 3,
-                                'label': 'cpu4',
+                                'value_limit': 100,
+                                'label': 'cpu3',
                                 'radius': 93,
                                 'angle': -90,
                                 'arc': 60,
                                 'width': 5,
-                                'source': 'macbook/load/load'
+                                'source': 'monitor1/cpu/3/cpu/user'
                             },
                         }
                     }

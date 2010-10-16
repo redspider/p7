@@ -232,7 +232,7 @@ world.OldAbsPieBar = Class.extend({
 });
 
 
-world.AbsPieBar = Class.extend({
+world.ArcBar = Class.extend({
     init: function (app, id, parent, config) {
         this.app = app;
         this.id = id;
@@ -251,6 +251,8 @@ world.AbsPieBar = Class.extend({
 
         this.old_value = 0;
         this.current_value = 0;
+        this.last_counter_value = null;
+        this.current_counter_value = null;
         this.alarm_status = false;
         
         if (this.source) {
@@ -261,7 +263,25 @@ world.AbsPieBar = Class.extend({
     
     on_message: function (m) {
         this.old_value = this.current_value;
-        this.current_value = m.values[0][1];
+        if (m.values[0][0] == 0) {
+            // Counter message, subtract from the old value, divide by time difference
+            if (this.last_counter_value == null) {
+                // No last counter value, so we start at 0 to avoid nasty infinities
+                this.last_counter_value = m.values[0][1];
+                this.current_counter_value = m.values[0][1];
+                this.current_value = 0;
+            } else {
+                // yay kinda
+                this.last_counter_value = this.current_counter_value;
+                this.current_counter_value = m.values[0][1];
+                // Fix to use previous message time instead of interval
+                this.current_value = (this.current_counter_value - this.last_counter_value)/(m.expected-m.time);
+            }
+        } else {
+            // Gauge message, just use the current value
+            this.current_value = m.values[0][1];
+        }
+        
         this.current_time = new Date().getTime();
         this.expected = (m.expected - m.time)*1000.0;
         if (this.current_value >= this.alarm) {
