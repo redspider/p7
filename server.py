@@ -177,7 +177,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                     'monitor1': {
                         'type': 'Router',
                         'template': 'server_template',
-                        'source_prefix': '',
+                        'source_prefix': 'monitor1/',
                         'label': 'monitor1',
                         'x': 140,
                         'y': 120,
