@@ -54,7 +54,9 @@ world.Template = Class.extend({
         this.id = id;
         this.parent = parent;
         this.config = config;
+        console.log("Template", config);
         world.templates[id] = this;
+        console.log("Templates",world.templates);
     },
     
     render: function () {}
