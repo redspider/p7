@@ -164,16 +164,27 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
                                 'width': 5,
                                 'source': 'cpu/3/cpu/user'
                             },
-                            'eth0': {
+                            'eth0_in': {
                                 'type': 'ArcBar',
                                 'value_unit': '',
                                 'value_limit': 10000000/8,
-                                'label': 'cpu0',
+                                'label': 'eth0 in',
                                 'radius': 72,
                                 'angle': 90,
                                 'arc': 60,
                                 'width': 5,
-                                'source': 'interface/if_octets/eth0'
+                                'source': 'interface/if_octets/eth0,0'
+                            },
+                            'eth0_out': {
+                                'type': 'ArcBar',
+                                'value_unit': '',
+                                'value_limit': 10000000/8,
+                                'label': 'eth0 in',
+                                'radius': 78,
+                                'angle': 90,
+                                'arc': 60,
+                                'width': 5,
+                                'source': 'interface/if_octets/eth0,1'
                             },
                         }
                     },

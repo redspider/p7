@@ -134,6 +134,23 @@ world.Router = Class.extend({
     }
 });
 
+function source_core(s) {
+    var index = s.indexOf(',');
+    if (index == -1) {
+        return s;
+    }
+    return s.substr(0,index);
+}
+
+function source_sub(s) {
+    var index = s.indexOf(',');
+    if (index == -1) {
+        return 0;
+    }
+    return 0+s.substr(index+1);
+}
+
+
 
 world.OldAbsPieBar = Class.extend({
     init: function (app, id, parent, config) {
@@ -154,7 +171,7 @@ world.OldAbsPieBar = Class.extend({
         this.current_value = 0;
         
         if (this.source) {
-            this.app.subscribe(this.source, $.proxy(this.on_message, this));
+            this.app.subscribe(source_core(this.source), $.proxy(this.on_message, this));
         }
         
     },
@@ -301,30 +318,31 @@ world.ArcBar = Class.extend({
             if (this.parent.source_prefix) {
                 this.source = this.parent.source_prefix + this.source;
             }
-            this.app.subscribe(this.source, $.proxy(this.on_message, this));
+            this.app.subscribe(source_core(this.source), $.proxy(this.on_message, this));
         }
         
     },
     
     on_message: function (m) {
+        var n = source_sub(this.source);
         this.old_value = this.current_value;
-        if (m.values[0][0] == 0) {
+        if (m.values[n][0] == 0) {
             // Counter message, subtract from the old value, divide by time difference
             if (this.last_counter_value == null) {
                 // No last counter value, so we start at 0 to avoid nasty infinities
-                this.last_counter_value = m.values[0][1];
-                this.current_counter_value = m.values[0][1];
+                this.last_counter_value = m.values[n][1];
+                this.current_counter_value = m.values[n][1];
                 this.current_value = 0;
             } else {
                 // yay kinda
                 this.last_counter_value = this.current_counter_value;
-                this.current_counter_value = m.values[0][1];
+                this.current_counter_value = m.values[n][1];
                 // Fix to use previous message time instead of interval
                 this.current_value = (this.current_counter_value - this.last_counter_value)/(m.expected-m.time);
             }
         } else {
             // Gauge message, just use the current value
-            this.current_value = m.values[0][1];
+            this.current_value = m.values[n][1];
         }
         
         this.current_time = new Date().getTime();
