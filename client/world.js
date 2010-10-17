@@ -147,7 +147,7 @@ function source_sub(s) {
     if (index == -1) {
         return 0;
     }
-    return 0+s.substr(index+1);
+    return parseInt(s.substr(index+1));
 }
 
 
