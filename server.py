@@ -34,7 +34,7 @@ class SourceSet(object):
     
     def send(self, source, ts, interval, values):
         for subscriber in self.subscribers.get(source,[]):
-            subscriber.msg(type="p7.s", source=source, values=values, time=ts, expected=ts+interval)
+            subscriber.msg(type="p7.s", source=source, values=values, time=ts, interval=interval)
 
 active_clients = []
 sources = SourceSet()
@@ -80,132 +80,11 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
             # Send the current configuration
             # Currently a fake config defining one layer, containing one node
             # which supplies a CPU source on source.raven.cpu
-            self.msg(type='p7.configure',config={
-                'world': {
-                    'server_template': {
-                        'type': 'Template',
-                        'radius': 20,
-                        'charts': {
-                            'mem_active': {
-                                'type': 'ArcBar',
-                                'value_unit': 'bytes',
-                                'value_limit': 256*1024*1024,
-                                'label': 'mem/used',
-                                'radius': 24,
-                                'angle': -90,
-                                'arc': 180,
-                                'width': 20,
-                                'source': 'memory/memory/used'
-                            },
-                            'disk_used': {
-                                'type': 'ArcBar',
-                                'value_unit': 'bytes',
-                                'value_limit': 9.4*1024*1024*1024,
-                                'label': 'disk/root',
-                                'radius': 48,
-                                'angle': -90,
-                                'arc': 180,
-                                'width': 20,
-                                'source': 'df/df/root'
-                            },
-                            'load': {
-                                'type': 'ArcBar',
-                                'value_unit': '',
-                                'value_limit': 5,
-                                'label': 'load',
-                                'radius': 24,
-                                'angle': 92,
-                                'arc': 176,
-                                'width': 44,
-                                'source': 'load/load',
-                                'alarm': 1.0,
-                            },
-                            'cpu0': {
-                                'type': 'ArcBar',
-                                'value_unit': '',
-                                'value_limit': 100,
-                                'label': 'cpu0',
-                                'radius': 72,
-                                'angle': -90,
-                                'arc': 60,
-                                'width': 5,
-                                'source': 'cpu/0/cpu/user'
-                            },
-                            'cpu1': {
-                                'type': 'ArcBar',
-                                'value_unit': '',
-                                'value_limit': 100,
-                                'label': 'cpu1',
-                                'radius': 79,
-                                'angle': -90,
-                                'arc': 60,
-                                'width': 5,
-                                'source': 'cpu/1/cpu/user'
-                            },
-                            'cpu2': {
-                                'type': 'ArcBar',
-                                'value_unit': '',
-                                'value_limit': 100,
-                                'label': 'cpu2',
-                                'radius': 86,
-                                'angle': -90,
-                                'arc': 60,
-                                'width': 5,
-                                'source': 'cpu/2/cpu/user'
-                            },
-                            'cpu3': {
-                                'type': 'ArcBar',
-                                'value_unit': '',
-                                'value_limit': 100,
-                                'label': 'cpu3',
-                                'radius': 93,
-                                'angle': -90,
-                                'arc': 60,
-                                'width': 5,
-                                'source': 'cpu/3/cpu/user'
-                            },
-                            'eth0_in': {
-                                'type': 'ArcBar',
-                                'value_unit': '',
-                                'value_limit': 10000000/8,
-                                'label': 'eth0 in',
-                                'radius': 72,
-                                'angle': 90,
-                                'arc': 60,
-                                'width': 5,
-                                'source': 'interface/if_octets/eth0,0'
-                            },
-                            'eth0_out': {
-                                'type': 'ArcBar',
-                                'value_unit': '',
-                                'value_limit': 10000000/8,
-                                'label': 'eth0 in',
-                                'radius': 78,
-                                'angle': 90,
-                                'arc': 60,
-                                'width': 5,
-                                'source': 'interface/if_octets/eth0,1'
-                            },
-                        }
-                    },
-                    'mail': {
-                        'type': 'Router',
-                        'label': 'mail',
-                        'template': 'server_template',
-                        'source_prefix': 'mail/',
-                        'x': 340,
-                        'y': 120,
-                    },
-                    'monitor1': {
-                        'type': 'Router',
-                        'template': 'server_template',
-                        'source_prefix': 'monitor1/',
-                        'label': 'monitor1',
-                        'x': 140,
-                        'y': 120,
-                    }
-                }
-            })
+            
+            config = json.load(open('config.js','r'))
+            
+            self.msg(type='p7.configure',config=config)
+            
             # Register client for time signaling
             active_clients.append(self)
             return
@@ -259,7 +138,7 @@ def on_collect(fd, events):
     
     iterable = collector.interpret()
     for m in iterable:
-        #pprint((m.source,list(m)))
+        pprint((m.source,list(m)))
         
         sources.send(m.source, m.time, m.interval, list(m))
 
@@ -286,7 +165,7 @@ def main():
     ioloop = tornado.ioloop.IOLoop.instance()
     
     # Set up collector
-    collector = collectd.Reader(host="67.23.45.129")
+    collector = collectd.Reader(host="192.168.0.199")
     collector._sock.setblocking(0)
     ioloop.add_handler(collector._sock.fileno(), on_collect, ioloop.READ)
 

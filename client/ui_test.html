@@ -7,13 +7,19 @@
         <script type="text/javascript" src="js/jquery-ui-1.8.5.custom.min.js"></script>
         <script type="text/javascript" src="support.js"></script>
         <script type="text/javascript" src="jssha256.js"></script>
+        <script type="text/javascript" src="namespace.js"></script>
+        <script type="text/javascript" src="style.js"></script>
+        <script type="text/javascript" src="scale.js"></script>
+        <script type="text/javascript" src="data.js"></script>
+        <script type="text/javascript" src="render.js"></script>
+        <script type="text/javascript" src="chart.js"></script>
         <script type="text/javascript" src="world.js"></script>
         <script type="text/javascript" src="app.js"></script>
         <script type="text/javascript" src="view.js"></script>
         
         <script type="text/javascript">
             $(document).ready(function () {
-                var app = new App(document.getElementById('app_canvas'), {wsuri: 'ws://monitor1.redspider.co.nz:8888/p7'});
+                var app = new App(document.getElementById('app_canvas'), {wsuri: 'ws://192.168.0.199:8888/p7'});
             });
         </script>
     </head>
