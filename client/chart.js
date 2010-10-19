@@ -34,7 +34,7 @@ com.p7.chart.Chart = Class.extend({
         this.app = app;
         this.id = id;
         this.prefix = prefix;
-        this.c = config;
+        this.c = $.extend(true,{},config);
         
         // Construct scale
         this.scale = new com.p7.scale[this.c.scale.type](this.app, this.c.scale);

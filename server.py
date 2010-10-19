@@ -138,7 +138,7 @@ def on_collect(fd, events):
     
     iterable = collector.interpret()
     for m in iterable:
-        pprint((m.source,list(m)))
+        #pprint((m.source,list(m)))
         
         sources.send(m.source, m.time, m.interval, list(m))
 
@@ -165,7 +165,7 @@ def main():
     ioloop = tornado.ioloop.IOLoop.instance()
     
     # Set up collector
-    collector = collectd.Reader(host="192.168.0.199")
+    collector = collectd.Reader(host="67.23.45.129")
     collector._sock.setblocking(0)
     ioloop.add_handler(collector._sock.fileno(), on_collect, ioloop.READ)
 
