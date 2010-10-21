@@ -11,6 +11,7 @@ from pprint import pprint
 
 from tornado.options import define, options
 
+define("client_config", default="config.js", help="Config.js for client display", type=str)
 define("port", default=8888, help="run on the given port", type=int)
 
 
@@ -81,7 +82,7 @@ class P7WebSocket(tornado.websocket.WebSocketHandler):
             # Currently a fake config defining one layer, containing one node
             # which supplies a CPU source on source.raven.cpu
             
-            config = json.load(open('config.js','r'))
+            config = json.load(open(options.client_config,'r'))
             
             self.msg(type='p7.configure',config=config)
             
