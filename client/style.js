@@ -1,8 +1,8 @@
 com.p7.style = {
     color: {
         mem_used: "rgba(212,189,121,X)",
-        mem_buffer: "rgba(200,170,82,X)",
-        mem_cached: "rgba(175,145,56,X)",
+        mem_buffer: "rgba(188,164,94,X)",
+        mem_cached: "rgba(152,133,79,X)",
         yellow: "rgba(212,212,121,X)",
         light_green: "rgba(189,212,121,X)",
         orange: "rgba(212,189,121,X)",
