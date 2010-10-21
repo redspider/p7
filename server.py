@@ -165,7 +165,7 @@ def main():
     ioloop = tornado.ioloop.IOLoop.instance()
     
     # Set up collector
-    collector = collectd.Reader(host="67.23.45.129")
+    collector = collectd.Reader(host="0.0.0.0")
     collector._sock.setblocking(0)
     ioloop.add_handler(collector._sock.fileno(), on_collect, ioloop.READ)
 
