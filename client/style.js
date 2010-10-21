@@ -13,6 +13,6 @@ com.p7.style = {
         dark_purple: "rgba(130,116,203,X)",
         blue: "rgba(116,152,203,X)",
         light_blue: "rgba(111,181,203,X)",
-        green: "rgba(116,203,116,X)"
+        green: "rgba(189,212,121,X)"
     }
 };
