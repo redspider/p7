@@ -85,7 +85,7 @@ world.Router = Class.extend({
         this.parent = parent;
         
         if (config.template) {
-            var new_config = $.extend(true, world.templates[config.template].config, config);
+            var new_config = $.extend(true, {}, world.templates[config.template].config, config);
             config = new_config;
         }
         
