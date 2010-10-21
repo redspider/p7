@@ -85,11 +85,8 @@ world.Router = Class.extend({
         this.parent = parent;
         
         if (config.template) {
-            for (var k in world.templates[config.template].config) {
-                if (config[k] == undefined) {
-                    config[k] = world.templates[config.template].config[k];
-                }
-            }
+            var new_config = $.extend(true, world.templates[config.template].config, config);
+            config = new_config;
         }
         
         this.label = config.label;
@@ -102,7 +99,9 @@ world.Router = Class.extend({
         for (var k in config.charts) {
             console.log(config.charts);
             var chart_config = config.charts[k];
-            this.children.push(new com.p7.chart.Chart(this.app, k, this.source_prefix, chart_config));
+            if (chart_config) {
+                this.children.push(new com.p7.chart.Chart(this.app, k, this.source_prefix, chart_config));
+            }
         }
         
     },
