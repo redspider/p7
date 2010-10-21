@@ -11,7 +11,7 @@ com.p7.style = {
         light_purple: "rgba(198,113,163,X)",
         purple: "rgba(166,111,194,X)",
         dark_purple: "rgba(130,116,203,X)",
-        blue: "rgba(116,152,203,X)",
+        blue: "rgba(189,212,121,X)",
         light_blue: "rgba(111,181,203,X)",
         green: "rgba(189,212,121,X)"
     }
