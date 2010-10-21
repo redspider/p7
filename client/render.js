@@ -133,6 +133,7 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
         var values = this.data.smooth_values();
         var attrs = this.data.attributes();
         var offset = 0;
+        this.scale.update_limit(this.data.full_sum());
         
         
         // Render each value stacked on the other

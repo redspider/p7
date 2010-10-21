@@ -53,11 +53,23 @@ com.p7.data.Stack = Class.extend({
         return parseInt(s.substr(index+1));
     },
     
-    // Returns sum of current values, for use with auto-scaling or alarms
+    // Returns sum of current values
     sum: function () {
         // WHERE THE FUCK IS THE SUM() FUNCTION??
         var sum = 0;
         var vals = this.smooth_values();
+        for (var i=0; i<vals.length; i++) {
+            if (vals[i]) {
+                sum+=vals[i];
+            }
+        }
+        return sum;
+    },
+    
+    // Returns sum of all values, for use with auto-scaling or alarms
+    full_sum: function () {
+        var sum = 0;
+        var vals = this.all_values();
         for (var i=0; i<vals.length; i++) {
             if (vals[i]) {
                 sum+=vals[i];
@@ -124,7 +136,23 @@ com.p7.data.Stack = Class.extend({
     // Returns a list of value attributes
     // [{label: X, color: Y},..]
     attributes: function () {
-        return this.c.sources.map(function (e) { return e; });
+        var result = [];
+        for (var k in this.c.sources) {
+            if (this.c.sources[k].visible || this.c.sources[k].visible == undefined) {
+                result.push(this.c.sources[k]);
+            }
+        }
+        return result;
+    },
+    
+    // Returns a list of all values:
+    // [V,V,V,V]
+    all_values: function () {
+        var result = [];
+        for (var k in this._values) {
+            result.push(this._values[k].current);
+        }
+        return result;
     },
     
     // Returns a list of values:
@@ -132,7 +160,9 @@ com.p7.data.Stack = Class.extend({
     values: function () {
         var result = [];
         for (var k in this._values) {
-            result.push(this._values[k].current);
+            if (this.sources[k].visible || this.sources[k].visible == undefined) {
+                result.push(this._values[k].current);
+            }
         }
         return result;
     },
@@ -144,6 +174,9 @@ com.p7.data.Stack = Class.extend({
         
         var result = [];
         for (var k in this._values) {
+            if (!(this.sources[k].visible || this.sources[k].visible == undefined)) {
+                continue;
+            }
             var e = $.extend({}, this._values[k]);
             var time_fraction = (now - e.received)/(e.interval * 1000.0);
             if (time_fraction > 1) {

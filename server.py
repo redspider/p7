@@ -139,7 +139,7 @@ def on_collect(fd, events):
     
     iterable = collector.interpret()
     for m in iterable:
-        #pprint((m.source,list(m)))
+        pprint((m.source,list(m)))
         
         sources.send(m.source, m.time, m.interval, list(m))
 

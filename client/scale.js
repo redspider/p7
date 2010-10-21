@@ -23,6 +23,17 @@ com.p7.scale.Scale = Class.extend({
     init: function (app, config) {
         this.app = app;
         this.c = config;
+        this.limit = this.c.limit;
+        if (this.limit == "auto") {
+            this.limit = 1;
+        }
+    },
+    
+    // Update auto-scaling limit if need-be
+    update_limit: function (limit) {
+        if (this.c.limit == "auto") {
+            this.limit = limit;
+        }
     },
     
     // Scale a value between 0 and 1
@@ -93,7 +104,7 @@ com.p7.scale.Scale = Class.extend({
 
 com.p7.scale.LinearScale = com.p7.scale.Scale.extend({
     scale: function (value) {
-        return Math.min(1.0, value / this.c.limit);
+        return Math.min(1.0, value / this.limit);
     }
 });
 
@@ -103,6 +114,6 @@ com.p7.scale.LinearScale = com.p7.scale.Scale.extend({
 // This is handy for making low values visible on charts
 com.p7.scale.LogScale = com.p7.scale.Scale.extend({
     scale: function (value) {
-        return Math.min(1.0, Math.log(value+1) / Math.log(this.c.limit));
+        return Math.min(1.0, Math.log(value+1) / Math.log(this.limit));
     }
 });
