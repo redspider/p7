@@ -23,6 +23,14 @@ com.p7.render.Render = Class.extend({
             return color.substr(0,color.length-2)+alpha+")";
         }
         return "rgba(200,200,200,"+alpha+"1)";
+    },
+    
+    // Normalize an angle (in radians)
+    normalize_angle: function (r) {
+        while (r < 0) {
+            r+=Math.PI*2;
+        }
+        return r % (Math.PI*2)
     }
 });
 
@@ -73,14 +81,21 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
         
         // Draw an arc from-to
         // We rotate back 90deg (so we start from 12 oclock), then forward start angle, then to From
-        ctx.rotate(-Math.PI/2+start+size*fraction);
+        var position = this.normalize_angle(-Math.PI/2+start+size*fraction);
+        ctx.rotate(position);
         ctx.font = '800 9px sans-serif';
         ctx.fillStyle = 'rgba(250,230,180,1.0)';
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
         
         ctx.translate(radius+this.c.width/2,0);
-        ctx.rotate(Math.PI/2);
+        
+        // Check to see if we've rotated upside-down
+        if (position > 0 && position < Math.PI) {
+            ctx.rotate(-Math.PI/2);
+        } else {
+            ctx.rotate(Math.PI/2);
+        }
         
         // Commented section renders a dim background box around the text to make it
         // easier to read

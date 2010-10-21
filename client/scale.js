@@ -62,6 +62,10 @@ com.p7.scale.Scale = Class.extend({
             symbols = ['','K','M','B','T','Q'];
         }
         
+        if (this.c.postfix) {
+            dtype += this.c.postfix;
+        }
+        
         if (this.c.output_type == 'value' && v < 10) {
             return ""+v.toFixed(2);
         }
