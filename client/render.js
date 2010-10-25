@@ -141,12 +141,19 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
         var offset = 0;
         this.scale.update_limit(this.data.full_sum());
         
+        if (this.data.sum() > 0.8) {
+            this.status = 'warn';
+        } else if (this.data.sum() > 0.9) {
+            this.status = 'alarm';
+        } else {
+            this.status = 'ok';
+        }
         
         // Render each value stacked on the other
         for (var i=0; i<values.length; i++) {
             //console.log(this.color('ok',0,1).toString());
-            ctx.fillStyle = this.color('ok',i,1).toString();
-            ctx.strokeStyle = this.color('ok',i,0.5).toString();
+            ctx.fillStyle = this.color(this.status,i,1).toString();
+            ctx.strokeStyle = this.color(this.status,i,0.5).toString();
             this._segment(this.c.radius, this.scale.scale(offset), this.scale.scale(values[i]+offset));
             offset += values[i];
         }
