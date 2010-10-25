@@ -143,9 +143,9 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
         var status_v = this.scale.scale(this.data.sum());
         
         
-        if (status_v > 0.8) {
+        if (status_v > 0.7) {
             this.status = 'warn';
-        } else if (status_v > 0.9) {
+        } else if (status_v > 0.8) {
             this.status = 'alarm';
         } else {
             this.status = 'ok';
@@ -154,8 +154,14 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
         // Render each value stacked on the other
         for (var i=0; i<values.length; i++) {
             //console.log(this.color('ok',0,1).toString());
-            ctx.fillStyle = this.color(this.status,i,1).toString();
-            ctx.strokeStyle = this.color(this.status,i,0.5).toString();
+            if (this.status == 'alarm') {
+                var intensity = (3+2*(Math.sin(new Date().getTime() /500)))/10;
+                ctx.fillStyle = this.color(this.status,i,intensity).toString();
+                ctx.strokeStyle = this.color(this.status,i,intensity/2).toString();
+            } else {
+                ctx.fillStyle = this.color(this.status,i,1).toString();
+                ctx.strokeStyle = this.color(this.status,i,0.5).toString();
+            }
             this._segment(this.c.radius, this.scale.scale(offset), this.scale.scale(values[i]+offset));
             offset += values[i];
         }
