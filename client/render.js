@@ -143,10 +143,10 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
         var status_v = this.scale.scale(this.data.sum());
         
         
-        if (status_v > 0.7) {
-            this.status = 'warn';
-        } else if (status_v > 0.8) {
+        if (status_v > 0.8) {
             this.status = 'alarm';
+        } else if (status_v > 0.7) {
+            this.status = 'warn';
         } else {
             this.status = 'ok';
         }
