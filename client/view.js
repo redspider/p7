@@ -107,7 +107,7 @@ var View = Class.extend({
         ctx.save();
         // Render stats
         ctx.fillStyle = "#564";
-        ctx.font = '800 20px sans-serif';
+        ctx.font = '800 20px Arial';
         ctx.fillText(Math.round(this.fps)+"fps", 2.5, 30.5);
         
         if (this.app.current_time) {
@@ -115,12 +115,12 @@ var View = Class.extend({
             var now = new Date(this.app.current_time*1000);
             var now_time = now.toTimeString().substr(0,8);
             var now_tz = now.toTimeString().substr(9);
-            ctx.font = '600 10px sans-serif';
+            ctx.font = '600 10px Arial';
             ctx.fillText("" + now.toDateString(), this.app.width-90, 20.5);
-            ctx.font = '600 20px sans-serif';
+            ctx.font = '600 20px Arial';
             ctx.fillText("" + now_time, this.app.width-90, 37.5);
             ctx.fillStyle = "#555";
-            ctx.font = '600 9px sans-serif';
+            ctx.font = '600 9px Arial';
             ctx.fillText("" + now_tz, this.app.width-87, 47.5);
             
             //ctx.fillText("" + new Date(this.app.current_time*1000).toLocaleString(), this.app.width-320, 20.5);
@@ -132,6 +132,7 @@ var View = Class.extend({
     // Render a frame
     frame: function () {
         // Clear background
+        this.app.ctx.font = '600 9px Arial';
         this.app.ctx.save();
         this.background();
         

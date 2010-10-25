@@ -89,7 +89,7 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
         // We rotate back 90deg (so we start from 12 oclock), then forward start angle, then to From
         var position = this.normalize_angle(-Math.PI/2+start+size*fraction);
         ctx.rotate(position);
-        ctx.font = '800 9px sans-serif';
+        ctx.font = '800 9px Arial';
         ctx.fillStyle = 'rgba(250,230,180,1.0)';
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
