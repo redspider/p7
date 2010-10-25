@@ -19,10 +19,16 @@ com.p7.render.Render = Class.extend({
     // Get color
     color: function (name, i, alpha) {
         if (name) {
-            var color = com.p7.style.color[name];
-            return color.substr(0,color.length-2)+alpha+")";
+            var color = $.extend({},com.p7.style.colors[name],true);
+            color.a = alpha;
+            
+            if (i>0) {
+                color.darken(i*10);
+            }
+            
+            return color;
         }
-        return "rgba(200,200,200,"+alpha+"1)";
+        return com.p7.style.Color(200,200,200,alpha);
     },
     
     // Normalize an angle (in radians)
@@ -138,8 +144,9 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
         
         // Render each value stacked on the other
         for (var i=0; i<values.length; i++) {
-            ctx.fillStyle = this.color(attrs[i].color,i,1);
-            ctx.strokeStyle = this.color(attrs[i].color,i,0.5);
+            //console.log(this.color('ok',0,1).toString());
+            ctx.fillStyle = this.color('ok',i,1).toString();
+            ctx.strokeStyle = this.color('ok',i,0.5).toString();
             this._segment(this.c.radius, this.scale.scale(offset), this.scale.scale(values[i]+offset));
             offset += values[i];
         }
