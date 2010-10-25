@@ -16,7 +16,7 @@ com.p7.style.RGB = Class.extend({
         var maxv = Math.max(r,g,b);
         var delta = maxv-minv;
         
-        var v = maxv * 360;
+        var v = maxv;
         var h = 0;
         var s = 0;
         
@@ -39,7 +39,7 @@ com.p7.style.RGB = Class.extend({
             if (h > 1) { h-= 1; }
         }
         
-        return new com.p7.style.HSV(v, h*100, v*100);
+        return new com.p7.style.HSV(h*360, s*100, v*100);
     }
 });
 
