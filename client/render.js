@@ -165,7 +165,7 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
             offset += values[i];
         }
         
-        if (this.c.width > 15) {
+        if (this.c.width > 20) {
             this._label(this.c.radius, 0.5, this.scale.label(this.data.sum()));
         }
         
