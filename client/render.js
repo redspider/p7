@@ -125,7 +125,7 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
  
         if (markpath) { 
             ctx.beginPath();       
-            ctx.strokeStyle = 'rgba(255,255,255,1.0)';
+            ctx.strokeStyle = 'rgba(255,255,255,0.5)';
             ctx.moveTo(markpath[0][0]+0.5,markpath[0][1]+0.5);
             for (var i = 1; i<markpath.length; i++) {
                 ctx.lineTo(markpath[i][0]+0.5,markpath[i][1]+0.5);
@@ -133,7 +133,7 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
             
             ctx.stroke();
             
-            ctx.fillStyle = 'rgba(255,255,255,0.8)';
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
             ctx.fillRect(markpath[0][0]-1, markpath[0][1]-1,3,3);
             ctx.fillRect(markpath[markpath.length-1][0]-1, markpath[markpath.length-1][1]-1,3,3);
         }
@@ -145,7 +145,7 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
             ctx.textAlign = 'left';
         }
         
-        ctx.fillStyle = 'rgba(255,255,255,1.0)';
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
         ctx.fillText(label + " " + v, 0,0);
       
         ctx.restore();  
