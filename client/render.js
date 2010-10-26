@@ -122,19 +122,22 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
  
-        ctx.beginPath();       
-        ctx.strokeStyle = 'rgba(255,255,255,1.0)';
-        ctx.moveTo(markpath[0][0]+0.5,markpath[0][1]+0.5);
-        for (var i = 1; i<markpath.length; i++) {
-            ctx.lineTo(markpath[i][0]+0.5,markpath[i][1]+0.5);
+ 
+        if (markpath) { 
+            ctx.beginPath();       
+            ctx.strokeStyle = 'rgba(255,255,255,1.0)';
+            ctx.moveTo(markpath[0][0]+0.5,markpath[0][1]+0.5);
+            for (var i = 1; i<markpath.length; i++) {
+                ctx.lineTo(markpath[i][0]+0.5,markpath[i][1]+0.5);
+            }
+            
+            ctx.stroke();
+            
+            ctx.fillStyle = 'rgba(255,255,255,0.8)';
+            ctx.fillRect(markpath[0][0]-1, markpath[0][1]-1,3,3);
+            ctx.fillRect(markpath[markpath.length-1][0]-1, markpath[markpath.length-1][1]-1,3,3);
+            ctx.translate(x,y);
         }
-        
-        ctx.stroke();
-        
-        ctx.fillStyle = 'rgba(255,255,255,0.8)';
-        ctx.fillRect(markpath[0][0]-1, markpath[0][1]-1,3,3);
-        ctx.fillRect(markpath[markpath.length-1][0]-1, markpath[markpath.length-1][1]-1,3,3);
-        ctx.translate(x,y);
         
         if (x<0) {
             ctx.textAlign = 'right';
