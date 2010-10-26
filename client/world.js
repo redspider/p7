@@ -134,14 +134,14 @@ world.Router = Class.extend({
         ctx.fill();
         ctx.stroke();
         */
-        ctx.font = '600 9px sans-serif';
-        ctx.strokeStyle = 'rgba(0,0,0,0.7)';
-        ctx.lineWidth = 2;
-        ctx.fillStyle = 'rgba(250,230,180,1.0)';
+        ctx.font = '800 9px Arial';
+        //ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+        //ctx.lineWidth = 2;
+        ctx.fillStyle = 'rgba(255,255,155,1.0)';
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
         ctx.beginPath();
-        ctx.strokeText(this.label, this.x,this.y);
+        //ctx.strokeText(this.label, this.x,this.y);
         ctx.fillText(this.label, this.x,this.y);
         
         ctx.restore();
