@@ -134,7 +134,7 @@ world.Router = Class.extend({
         ctx.fill();
         ctx.stroke();
         */
-        ctx.font = '800 9px Neuropol';
+        ctx.font = '800 9px moderna';
         //ctx.strokeStyle = 'rgba(0,0,0,0.7)';
         //ctx.lineWidth = 2;
         ctx.fillStyle = 'rgba(255,255,255,1.0)';

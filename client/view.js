@@ -65,6 +65,19 @@ var View = Class.extend({
         ctx.fillStyle = "black";
         ctx.strokeStyle = "black";
         
+        ctx.save();
+        ctx.textAlign = 'left';
+        ctx.fillStyle = "rgba(255,255,255,0.8)";
+        ctx.font = '800 16px moderna';
+        ctx.fillText("MONITOR", 25, 25.5);
+        ctx.beginPath();
+        ctx.moveTo(10, 30.5);
+        ctx.lineTo(this.app.width-10,30.5);
+        ctx.strokeStyle = "rgba(255,255,255,0.8)";
+        ctx.stroke();
+        ctx.fillStyle = "rgba(255,255,255,0.8)";
+        ctx.fillRect(10,14,10,12);
+        ctx.restore();
     },
     
     // Set up modal dialog explaining connection is in progress
@@ -106,22 +119,24 @@ var View = Class.extend({
         
         ctx.save();
         // Render stats
+        ctx.textAlign = 'right';
         ctx.fillStyle = "rgba(255,255,255,0.5)";
-        ctx.font = '800 20px Neuropol';
-        ctx.fillText(Math.round(this.fps)+"fps", 2.5, 30.5);
+        ctx.font = '800 10px moderna';
+        ctx.fillText(Math.round(this.fps)+"fps", this.app.width-10, 82.5);
         
         if (this.app.current_time) {
+            ctx.textAlign = 'right';
             ctx.fillStyle = "rgba(255,255,255,0.8)";
             var now = new Date(this.app.current_time*1000);
             var now_time = now.toTimeString().substr(0,8);
             var now_tz = now.toTimeString().substr(9);
-            ctx.font = '600 10px Neuropol';
-            ctx.fillText("" + now.toDateString(), this.app.width-110, 20.5);
-            ctx.font = '600 20px Neuropol';
-            ctx.fillText("" + now_time, this.app.width-110, 37.5);
+            ctx.font = '600 10px moderna';
+            ctx.fillText("" + now.toDateString(), this.app.width-10, 42.5);
+            ctx.font = '600 20px moderna';
+            ctx.fillText("" + now_time, this.app.width-10, 59.5);
             ctx.fillStyle = "#555";
-            ctx.font = '600 9px Neuropol';
-            ctx.fillText("" + now_tz, this.app.width-110, 47.5);
+            ctx.font = '600 9px moderna';
+            ctx.fillText("" + now_tz, this.app.width-10, 70.5);
             
             //ctx.fillText("" + new Date(this.app.current_time*1000).toLocaleString(), this.app.width-320, 20.5);
         }
