@@ -114,6 +114,40 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
         ctx.restore();  
     },
     
+    _label_flat: function (x,y,label,v, markpath) {
+        var ctx = this.app.ctx;
+        ctx.save();
+        
+        ctx.font = '800 9px Arial';
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'center';
+ 
+        ctx.beginPath();       
+        ctx.strokeStyle = 'rgba(255,255,255,1.0)';
+        ctx.moveTo(markpath[0][0]+0.5,markpath[0][1]+0.5);
+        for (var i = 1; i<markpath.length; i++) {
+            ctx.lineTo(markpath[i][0]+0.5,markpath[i][1]+0.5);
+        }
+        
+        ctx.stroke();
+        
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.fillRect(markpath[0][0]-1, markpath[0][1]-1,3,3);
+        ctx.fillRect(markpath[markpath.length-1][0]-1, markpath[markpath.length-1][1]-1,3,3);
+        ctx.translate(x,y);
+        
+        if (x<0) {
+            ctx.textAlign = 'right';
+        } else {
+            ctx.textAlign = 'left';
+        }
+        
+        ctx.fillStyle = 'rgba(255,255,255,1.0)';
+        ctx.fillText(label + " " + v, 0,0);
+      
+        ctx.restore();  
+    },
+    
     render: function () {
         var ctx = this.app.ctx;
         ctx.save();
@@ -150,6 +184,7 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
             this.status = 'ok';
         }
         
+        ctx.save();
         // Render each value stacked on the other
         for (var i=0; i<values.length; i++) {
             //console.log(this.color('ok',0,1).toString());
@@ -193,9 +228,16 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
             offset += values[i];
         }
         
+        ctx.restore();
+        
+        if (this.c.labelx) {
+            this._label_flat(this.c.labelx, this.c.labely, this.c.label, this.scale.label(this.data.sum()), this.c.markpath);
+        }
+        /*
         if (this.c.width > 20) {
             this._label(this.c.radius, 0.5, this.scale.label(this.data.sum()));
         }
+        */
         
         ctx.restore();
         
