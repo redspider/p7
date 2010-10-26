@@ -137,7 +137,7 @@ world.Router = Class.extend({
         ctx.font = '800 9px Arial';
         //ctx.strokeStyle = 'rgba(0,0,0,0.7)';
         //ctx.lineWidth = 2;
-        ctx.fillStyle = 'rgba(255,255,155,1.0)';
+        ctx.fillStyle = 'rgba(255,255,255,1.0)';
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
         ctx.beginPath();
