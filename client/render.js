@@ -43,7 +43,7 @@ com.p7.render.Render = Class.extend({
 com.p7.render.ArcBar = com.p7.render.Render.extend({
     
     // Draw an arc bar at radius, from-to. From and To are specified in fractions of 360deg
-    _segment: function (radius, from, to) {
+    _segment: function (radius, from, to, width) {
         var ctx = this.app.ctx;
         ctx.save();
         
@@ -62,9 +62,9 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
         // Rotate to end because we're lazy
         ctx.rotate(size*(to-from));
         // Draw line outwards
-        ctx.lineTo(radius+this.c.width);
+        ctx.lineTo(radius+width);
         // Arc backwards
-        ctx.arc(0,0,radius+this.c.width,0,-size*(to-from),1);
+        ctx.arc(0,0,radius+width,0,-size*(to-from),1);
         // Rotate back because we're SO lazy
         ctx.rotate(-size*(to-from));
         // Draw line inwards
@@ -129,7 +129,7 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
         ctx.strokeStyle = "rgba(0,0,0,1)";
         ctx.lineWidth = 1;
         
-        this._segment(this.c.radius,0,1.0);
+        this._segment(this.c.radius,0,1.0, this.c.width);
         
         ctx.restore();
         
@@ -153,6 +153,30 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
         // Render each value stacked on the other
         for (var i=0; i<values.length; i++) {
             //console.log(this.color('ok',0,1).toString());
+            /*
+            if (this.status == 'alarm') {
+                var intensity = (3+2*(Math.sin(new Date().getTime() /500)))/10;
+                ctx.fillStyle = this.color(this.status,i,intensity/2).toString();
+                ctx.strokeStyle = this.color(this.status,i,intensity/4).toString();
+            } else {
+                ctx.fillStyle = this.color(this.status,i,0.25).toString();
+                ctx.strokeStyle = this.color(this.status,i,0.25).toString();
+            }
+            var hdr_rad = Math.max(this.c.radius-2,0);
+            var hdr_width = this.c.width + 4 + Math.min(this.c.radius-2,0);
+            var hdr_start = this.scale.scale(offset);
+            var hdr_end = this.scale.scale(values[i]+offset);
+            if (i==0) {
+                hdr_start -= 0.01;
+            }
+            if (i==values.length-1) {
+                hdr_end+= 0.01;
+            }
+            
+            this._segment(hdr_rad, hdr_start, hdr_end, hdr_width);
+            */
+            
+            
             if (this.status == 'alarm') {
                 var intensity = (3+2*(Math.sin(new Date().getTime() /500)))/10;
                 ctx.fillStyle = this.color(this.status,i,intensity).toString();
@@ -161,7 +185,10 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
                 ctx.fillStyle = this.color(this.status,i,1).toString();
                 ctx.strokeStyle = this.color(this.status,i,0.5).toString();
             }
-            this._segment(this.c.radius, this.scale.scale(offset), this.scale.scale(values[i]+offset));
+            ctx.shadowColor = this.color(this.status,i,1).toString();
+            ctx.shadowBlur = 4;
+            
+            this._segment(this.c.radius, this.scale.scale(offset), this.scale.scale(values[i]+offset), this.c.width);
             offset += values[i];
         }
         

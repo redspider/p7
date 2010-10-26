@@ -111,7 +111,7 @@ com.p7.style.Color = Class.extend({
 });
 
 com.p7.style.colors = {
-    ok: new com.p7.style.Color(189,212,121,1),
+    ok: new com.p7.style.Color(255,255,255,1),
     warn: new com.p7.style.Color(222,184,126,1),
     alarm: new com.p7.style.Color(212,0,0,1)
 };
