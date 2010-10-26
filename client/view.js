@@ -106,12 +106,12 @@ var View = Class.extend({
         
         ctx.save();
         // Render stats
-        ctx.fillStyle = "#564";
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
         ctx.font = '800 20px Arial';
         ctx.fillText(Math.round(this.fps)+"fps", 2.5, 30.5);
         
         if (this.app.current_time) {
-            ctx.fillStyle = "#A95";
+            ctx.fillStyle = "rgba(255,255,255,0.8)";
             var now = new Date(this.app.current_time*1000);
             var now_time = now.toTimeString().substr(0,8);
             var now_tz = now.toTimeString().substr(9);
