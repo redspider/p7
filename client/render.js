@@ -182,11 +182,12 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
                 ctx.fillStyle = this.color(this.status,i,intensity).toString();
                 ctx.strokeStyle = this.color(this.status,i,intensity/2).toString();
             } else {
-                ctx.fillStyle = this.color(this.status,i,1).toString();
-                ctx.strokeStyle = this.color(this.status,i,0.5).toString();
+                ctx.fillStyle = this.color(this.status,i,0.8).toString();
+                ctx.strokeStyle = this.color(this.status,i,1.0).toString();
+                ctx.lineWidth = 2;
             }
-            ctx.shadowColor = this.color(this.status,i,1).toString();
-            ctx.shadowBlur = 4;
+            //ctx.shadowColor = this.color(this.status,i,1).toString();
+            //ctx.shadowBlur = 4;
             
             this._segment(this.c.radius, this.scale.scale(offset), this.scale.scale(values[i]+offset), this.c.width);
             offset += values[i];
