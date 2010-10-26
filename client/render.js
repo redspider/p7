@@ -187,7 +187,7 @@ com.p7.render.ArcBar = com.p7.render.Render.extend({
                 ctx.lineWidth = 2;
             }
             ctx.shadowColor = this.color(this.status,i,1).toString();
-            ctx.shadowBlur = 8;
+            ctx.shadowBlur = 8*this.scale.scale(values[i]);
             
             this._segment(this.c.radius, this.scale.scale(offset), this.scale.scale(values[i]+offset), this.c.width);
             offset += values[i];
